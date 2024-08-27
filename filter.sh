@@ -39,7 +39,7 @@ done < $source_file     # The source file argument provided from the command lin
     # use process substitution to write the string to the "temp.txt" file
 echo -e "$filtered_items" > temp.txt
 
-# Use "grep" command to count non-empty lines in the "temp.txt" file
+# Use command substitution to assign the result of "grep" command to "line_count"
     # ^: the start of the line
     # \s: represent white space character
     # *: zero or more occurences of white space character
