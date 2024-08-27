@@ -25,10 +25,10 @@ fi
 
 filtered_items=""   # Create a sring to store filtered products
 
-# IFS value set to comma to accomodate the source file format
+# IFS value set to comma to match the source file format
 while IFS=',' read -r smartphone brand model ram storage color price || [ -n "$item" ]; do  # Use while loop to read the source file line by line, with each field in matching header
     if [[ $input_ram == $ram ]] && [[ $input_storage == $storage ]]; then   # If ram and storage capacity of current line match input arguments
-        if [[ -n "$filtered_items" ]] && [[ ! -z "$filtered_items" ]]; then   # If the string doesn't contain a new line character (not the end of the file)
+        if [[ -n "$filtered_items" ]] && [[ ! -z "$filtered_items" ]]; then   # If the string doesn't contain a new line character and it is not empty (not the end of the file)
             filtered_items+="\n"    # Append a new line to the end of the string
         fi
         filtered_items+="$brand,$model,$color,$price" # Append the string with new entry
@@ -39,11 +39,18 @@ done < $source_file     # The source file argument provided from the command lin
     # use process substitution to write the string to the "temp.txt" file
 echo -e "$filtered_items" > temp.txt
 
-line_count=$(grep -cve '^\s*$' temp.txt)    # Use grep command to count non-empty lines in the "temp.txt" file
+# Use "grep" command to count non-empty lines in the "temp.txt" file
+    # ^: the start of the line
+    # \s: represent white space character
+    # *: zero or more occurences of white space character
+    # -c: print a count of matching lines
+    # -v: invert the sense of matching, to select non-empty lines
+    # $: the end of the line
+line_count=$(grep -cv '^\s*$' temp.txt)
 
 # If the line count is greater than 0 ("temp.txt" is not empty)
 if [ $line_count -gt 0 ]; then
-    # Print a message with the number of products found from provided arguments
+    # Print a message with the number of products matched input RAM and Storage Capacity
     echo "$line_count devices were found with ${input_ram}GB RAM and ${input_storage}GB Storage from:"
 
     declare -a unique_brands    # Create an array to store unique brands
@@ -62,8 +69,9 @@ if [ $line_count -gt 0 ]; then
     done < <(cut -d',' -f1 temp.txt)    # Extract 1st column (phone brand) from the "temp.txt" file
                                             # and use process substitution to treat the "cut" command as a file so while loop can process it
 
-    for brand in "${unique_brands[@]}"; do  # Loop through the unique brands array
-        # Print current brand and a count of matching lines in the "temp.txt" file
+    for brand in "${unique_brands[@]}"; do  # Loop through the "unique_brands" array
+        # Use "grep" to count the occurences of the current brand in the "temp.txt" file
+        # and print current brand along with its count
         printf "%-12s %-5s\n" "$brand" "($(grep -c $brand temp.txt))"
     done
 
@@ -72,12 +80,12 @@ if [ $line_count -gt 0 ]; then
     printf "${BLUE}%-18s | %-18s | %-18s | %-18s${NC}\n" "BRAND" "MODEL" "COLOR" "PRICE"   # Print specified column headers with stipulated format
 
     while IFS=',' read -r brand model color price || [ -n "$item" ]; do  # Read line by line until reach new line
-        printf "%-18s | %-18s | %-18s | %-18s \n" "$brand" "$model" "$color" "\$$price"   # Print each field in matching headers, precede $price with \$ to escape special character
+        printf "%-18s | %-18s | %-18s | %-18s \n" "$brand" "$model" "$color" "\$$price"   # Print each field in matching headers, precede "$price" with "\$"" to escape special character
     done < "temp.txt"      # "temp.txt" as input source for while loop
 else
     echo "No devices were found with ${input_ram}GB RAM and ${input_storage}GB Storage."    # Otherwise, print no results message
 fi
 
-rm -r temp.txt  # Delete the temp.txt file before exiting program
+rm -r temp.txt  # Delete the "temp.txt" file before exiting program
 
 exit 0  # exit program
