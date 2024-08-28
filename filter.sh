@@ -8,12 +8,12 @@ input_ram=$1
 input_storage=$2
 source_file=$3
 
-if [[ -z $input_ram ]] || [[ ! $input_ram =~ ^[1-9]+$ ]]; then  # Check if RAM is empty and is not a number
+if [[ -z $input_ram ]] || [[ ! $input_ram =~ ^[0-9]+$ ]]; then  # Check if RAM is empty and is not a number
     echo "Please input a valid capacity for RAM"    # Print invalid message
     exit 1      # Exit program with status code 1 on failed validation
 fi
 
-if [[ -z $input_storage ]] || [[ ! $input_storage =~ ^[1-9]+$ ]]; then  # Check if Storage is empty and is not a number
+if [[ -z $input_storage ]] || [[ ! $input_storage =~ ^[0-9]+$ ]]; then  # Check if Storage is empty and is not a number
     echo "Please input a valid capacity for Storage"  # Print invalid message
     exit 1      # Exit program with status code 1 on failed validation
 fi
